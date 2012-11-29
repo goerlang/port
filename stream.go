@@ -15,6 +15,10 @@ func Stream(r io.Reader, w io.Writer) (Port, error) {
 	return &streamPort{r, w}, nil
 }
 
+func (p *streamPort) Read(out []byte) (int, error) {
+	return p.r.Read(out)
+}
+
 func (p *streamPort) ReadOne() ([]byte, error) {
 	b := []byte{0}
 	_, err := p.r.Read(b)

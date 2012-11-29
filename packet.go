@@ -24,56 +24,85 @@ func Packet(r io.Reader, w io.Writer, sizeLen int) (Port, error) {
 	return nil, ErrBadSizeLen
 }
 
-func (pr *packetPort) ReadOne() ([]byte, error) {
-	if _, err := io.ReadFull(pr.r, pr.sizeBuf); err != nil {
-		return nil, err
+func (p *packetPort) Read(out []byte) (int, error) {
+	size, err := p.readSize()
+	if err != nil {
+		return 0, err
+	} else if size == 0 {
+		return 0, nil
 	}
 
-	var size int
-
-	switch len(pr.sizeBuf) {
-	case 1:
-		size = int(pr.sizeBuf[0])
-	case 2:
-		size = int(BigEndian.Uint16(pr.sizeBuf))
-	case 4:
-		size32 := BigEndian.Uint32(pr.sizeBuf)
-		size = int(size32)
-		if uint32(size) != size32 {
-			return nil, ErrSizeOverflow
+	if size > len(out) {
+		// skip the packet, so too big packets can be ignored
+		for size > 0 && (err == nil || err == io.EOF) {
+			var n int
+			n, err = p.r.Read(out)
+			size -= n
 		}
+
+		return 0, ErrTooBig
 	}
 
-	if size == 0 {
+	return size, nil
+}
+
+func (p *packetPort) ReadOne() ([]byte, error) {
+	size, err := p.readSize()
+	if err != nil {
+		return nil, err
+	} else if size == 0 {
 		return []byte{}, nil
 	}
 
 	data := make([]byte, size)
-	if _, err := io.ReadFull(pr.r, data); err != nil {
+	if _, err := io.ReadFull(p.r, data); err != nil {
 		return nil, err
 	}
 
 	return data, nil
 }
 
-func (pr *packetPort) Write(data []byte) (int, error) {
+func (p *packetPort) Write(data []byte) (int, error) {
 	size := len(data)
-	if size > pr.max {
+	if size > p.max {
 		return 0, ErrSizeOverflow
 	}
 
-	switch len(pr.sizeBuf) {
+	switch len(p.sizeBuf) {
 	case 1:
-		pr.sizeBuf[0] = uint8(size)
+		p.sizeBuf[0] = uint8(size)
 	case 2:
-		BigEndian.PutUint16(pr.sizeBuf, uint16(size))
+		BigEndian.PutUint16(p.sizeBuf, uint16(size))
 	case 4:
-		BigEndian.PutUint32(pr.sizeBuf, uint32(size))
+		BigEndian.PutUint32(p.sizeBuf, uint32(size))
 	}
 
-	if n, err := pr.w.Write(pr.sizeBuf); err != nil {
+	if n, err := p.w.Write(p.sizeBuf); err != nil {
 		return n, err
 	}
 
-	return pr.w.Write(data)
+	return p.w.Write(data)
+}
+
+func (p *packetPort) readSize() (int, error) {
+	if _, err := io.ReadFull(p.r, p.sizeBuf); err != nil {
+		return 0, err
+	}
+
+	var size int
+
+	switch len(p.sizeBuf) {
+	case 1:
+		size = int(p.sizeBuf[0])
+	case 2:
+		size = int(BigEndian.Uint16(p.sizeBuf))
+	case 4:
+		size32 := BigEndian.Uint32(p.sizeBuf)
+		size = int(size32)
+		if uint32(size) != size32 {
+			return 0, ErrSizeOverflow
+		}
+	}
+
+	return size, nil
 }

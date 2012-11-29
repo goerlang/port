@@ -8,6 +8,15 @@ import (
 )
 
 type Port interface {
+	// Read reads up to len(p) bytes into p.
+	// It returns the number of bytes read (0 <= n <= len(p)) and any
+	// error encountered.
+	//
+	// In case of line (or packet) based port, receiving a line (packet) of size
+	// bigger than len(p) will skip the line (packet) and return n=0 and err=ErrTooBig.
+	// It is up to the caller to choose whether to consider this as a fatal error or to continue
+	// reading from the port.
+	Read(p []byte) (n int, err error)
 	// ReadOne reads one packet (or line, if it's a line-based port).
 	ReadOne() (data []byte, err error)
 	// Write writes len(data) bytes from data to the port.
@@ -18,6 +27,7 @@ type Port interface {
 }
 
 var (
-	ErrSizeOverflow = errors.New("eport: packet size overflow")
 	ErrBadSizeLen   = errors.New("eport: bad 'packet size' length")
+	ErrSizeOverflow = errors.New("eport: packet size overflow")
+	ErrTooBig       = errors.New("eport: packet does not fit the buffer")
 )
