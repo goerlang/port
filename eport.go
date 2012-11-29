@@ -45,6 +45,12 @@ func Packet(r io.Reader, w io.Writer, sizeLen int) (Port, error) {
 	return nil, ErrBadSizeLen
 }
 
+// Stream returns a new stream-based port.
+// Note that ReadOne() will only read one byte on each call.
+func Stream(r io.Reader, w io.Writer) (Port, error) {
+	return &streamPort{r, w}, nil
+}
+
 type linePort struct {
 	r *bufio.Reader
 	w io.Writer
@@ -117,4 +123,19 @@ func (pr *packetPort) Write(data []byte) (int, error) {
 	}
 
 	return pr.w.Write(data)
+}
+
+type streamPort struct {
+	r io.Reader
+	w io.Writer
+}
+
+func (p *streamPort) ReadOne() ([]byte, error) {
+	b := []byte{0}
+	_, err := p.r.Read(b)
+	return b, err
+}
+
+func (p *streamPort) Write(data []byte) (int, error) {
+	return p.w.Write(data)
 }
