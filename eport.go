@@ -5,26 +5,22 @@ package eport
 
 import (
 	"errors"
+	"io"
 )
 
+// Port is an abstraction over different types of ports.
+//
+// While using Read() on a line (or packet) based port it may happen that the size
+// of the line (packet) is bigger than len(p). In this case eport skips the line (packet)
+// and return n=0 and err=ErrTooBig.
+// It is up to the caller to choose whether to consider this as a fatal error
+// or to continue reading.
 type Port interface {
-	// Read reads up to len(p) bytes into p.
-	// It returns the number of bytes read (0 <= n <= len(p)) and any
-	// error encountered.
-	//
-	// In case of line (or packet) based port, receiving a line (packet) of size
-	// bigger than len(p) will skip the line (packet) and return n=0 and err=ErrTooBig.
-	// It is up to the caller to choose whether to consider this as a fatal error
-	// or to continue reading.
-	Read(p []byte) (n int, err error)
+	io.Reader
+	io.Writer
 	// ReadOne reads either one packet, one line (ending with '\n') or a byte
 	// from a packet, line or stream-based port accordingly.
 	ReadOne() (data []byte, err error)
-	// Write writes len(data) bytes from data to the port.
-	// It returns the number of bytes written from data (0 <= n <= len(data))
-	// and any error encountered that caused the write to stop early.
-	// Write must return a non-nil error if it returns n < len(data).
-	Write(data []byte) (n int, err error)
 }
 
 var (
