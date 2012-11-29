@@ -14,10 +14,11 @@ type Port interface {
 	//
 	// In case of line (or packet) based port, receiving a line (packet) of size
 	// bigger than len(p) will skip the line (packet) and return n=0 and err=ErrTooBig.
-	// It is up to the caller to choose whether to consider this as a fatal error or to continue
-	// reading from the port.
+	// It is up to the caller to choose whether to consider this as a fatal error
+	// or to continue reading.
 	Read(p []byte) (n int, err error)
-	// ReadOne reads one packet (or line, if it's a line-based port).
+	// ReadOne reads either one packet, one line (ending with '\n') or a byte
+	// from a packet, line or stream-based port accordingly.
 	ReadOne() (data []byte, err error)
 	// Write writes len(data) bytes from data to the port.
 	// It returns the number of bytes written from data (0 <= n <= len(data))

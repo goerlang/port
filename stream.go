@@ -10,7 +10,6 @@ type streamPort struct {
 }
 
 // Stream returns a new stream-based port.
-// Note that ReadOne() will only read one byte on each call.
 func Stream(r io.Reader, w io.Writer) (Port, error) {
 	return &streamPort{r, w}, nil
 }
