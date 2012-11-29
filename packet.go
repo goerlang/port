@@ -55,11 +55,9 @@ func (p *packetPort) ReadOne() ([]byte, error) {
 	}
 
 	data := make([]byte, size)
-	if _, err := io.ReadFull(p.r, data); err != nil {
-		return nil, err
-	}
+	_, err := io.ReadFull(p.r, data)
 
-	return data, nil
+	return data, err
 }
 
 func (p *packetPort) Write(data []byte) (int, error) {
