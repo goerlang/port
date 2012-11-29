@@ -25,6 +25,6 @@ type Port interface {
 
 var (
 	ErrBadSizeLen   = errors.New("eport: bad 'packet size' length")
-	ErrSizeOverflow = errors.New("eport: packet size overflow")
+	ErrSizeOverflow = errors.New("eport: packet size overflows integer type")
 	ErrTooBig       = errors.New("eport: packet does not fit the buffer")
 )
