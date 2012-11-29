@@ -43,7 +43,7 @@ func (p *packetPort) Read(out []byte) (int, error) {
 		return 0, ErrTooBig
 	}
 
-	return size, nil
+	return io.ReadFull(p.r, out[:size])
 }
 
 func (p *packetPort) ReadOne() ([]byte, error) {
@@ -55,9 +55,9 @@ func (p *packetPort) ReadOne() ([]byte, error) {
 	}
 
 	data := make([]byte, size)
-	_, err := io.ReadFull(p.r, data)
+	size, err = io.ReadFull(p.r, data)
 
-	return data, err
+	return data[:size], err
 }
 
 func (p *packetPort) Write(data []byte) (int, error) {

@@ -19,9 +19,9 @@ func (p *streamPort) Read(out []byte) (int, error) {
 }
 
 func (p *streamPort) ReadOne() ([]byte, error) {
-	b := []byte{0}
-	_, err := p.r.Read(b)
-	return b, err
+	b := make([]byte, 1)
+	size, err := p.r.Read(b)
+	return b[:size], err
 }
 
 func (p *streamPort) Write(data []byte) (int, error) {
