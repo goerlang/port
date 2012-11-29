@@ -26,7 +26,7 @@ var (
 )
 
 // Line returns a new line-based port.
-func Line(r io.ReadWriter, w io.Writer) (Port, error) {
+func Line(r io.Reader, w io.Writer) (Port, error) {
 	return &linePort{
 		bufio.NewReader(r),
 		w,
