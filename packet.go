@@ -81,8 +81,8 @@ func (p *packetPort) Write(data []byte) (int, error) {
 		BigEndian.PutUint32(p.sizeBuf, uint32(size))
 	}
 
-	if n, err := p.w.Write(p.sizeBuf); err != nil {
-		return n, err
+	if _, err := p.w.Write(p.sizeBuf); err != nil {
+		return 0, err
 	}
 
 	return p.w.Write(data)
