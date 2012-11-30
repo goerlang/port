@@ -53,5 +53,19 @@ func testRead(
 	}
 }
 
-func testWrite(t *testing.T, p Port) {
+func testWrite(t *testing.T, p Port, w *bytes.Buffer, sizes []int, outs []bs, final bs) {
+	for i, out := range outs {
+		n, err := p.Write(out)
+		if n != sizes[i] {
+			t.Errorf("failed on %d: expected size %d, got %d", i, sizes[i], n)
+		}
+
+		if err != nil {
+			t.Errorf("failed on %d: %#v", err)
+		}
+	}
+
+	if bytes.Compare(w.Bytes(), final) != 0 {
+		t.Errorf("expected %#v, got %#v", final, w.Bytes())
+	}
 }

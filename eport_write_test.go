@@ -1,40 +1,27 @@
 package eport
 
 import (
-	"bytes"
 	"testing"
 )
 
 func TestLineWrite(t *testing.T) {
 	final := bs("1234567890123\n\nфыва\r\n\tолдж\n1")
 	outs := []bs{bs("123456789"), bs("0123\n"), bs("\nфыва"), bs("\r\n\tолдж\n1")}
+	sizes := []int{9, 5, 9, 13}
 
 	r, w := newRW(bs{})
 	p, _ := Line(r, w)
-
-	for _, out := range outs {
-		p.Write(out)
-	}
-
-	if bytes.Compare(w.Bytes(), final) != 0 {
-		t.Errorf("expected %#v, got %#v", final, w.Bytes())
-	}
+	testWrite(t, p, w, sizes, outs, final)
 }
 
 func TestPacket1Write(t *testing.T) {
 	final := bs("\x09123456789\x050123\n\x09\nфыва\x0d\r\n\tолдж\n1")
 	outs := []bs{bs("123456789"), bs("0123\n"), bs("\nфыва"), bs("\r\n\tолдж\n1")}
+	sizes := []int{9, 5, 9, 13}
 
 	r, w := newRW(bs{})
 	p, _ := Packet(r, w, 1)
-
-	for _, out := range outs {
-		p.Write(out)
-	}
-
-	if bytes.Compare(w.Bytes(), final) != 0 {
-		t.Errorf("expected %#v, got %#v", final, w.Bytes())
-	}
+	testWrite(t, p, w, sizes, outs, final)
 
 	exp := 255
 	n, err := p.Write(make([]byte, exp))
@@ -49,17 +36,11 @@ func TestPacket1Write(t *testing.T) {
 func TestPacket2Write(t *testing.T) {
 	final := bs("\x00\x09123456789\x00\x050123\n\x00\x09\nфыва\x00\x0d\r\n\tолдж\n1")
 	outs := []bs{bs("123456789"), bs("0123\n"), bs("\nфыва"), bs("\r\n\tолдж\n1")}
+	sizes := []int{9, 5, 9, 13}
 
 	r, w := newRW(bs{})
 	p, _ := Packet(r, w, 2)
-
-	for _, out := range outs {
-		p.Write(out)
-	}
-
-	if bytes.Compare(w.Bytes(), final) != 0 {
-		t.Errorf("expected %#v, got %#v", final, w.Bytes())
-	}
+	testWrite(t, p, w, sizes, outs, final)
 
 	exp := 65535
 	n, err := p.Write(make([]byte, exp))
@@ -74,17 +55,11 @@ func TestPacket2Write(t *testing.T) {
 func TestPacket4Write(t *testing.T) {
 	final := bs("\x00\x00\x00\x09123456789\x00\x00\x00\x050123\n\x00\x00\x00\x09\nфыва\x00\x00\x00\x0d\r\n\tолдж\n1")
 	outs := []bs{bs("123456789"), bs("0123\n"), bs("\nфыва"), bs("\r\n\tолдж\n1")}
+	sizes := []int{9, 5, 9, 13}
 
 	r, w := newRW(bs{})
 	p, _ := Packet(r, w, 4)
-
-	for _, out := range outs {
-		p.Write(out)
-	}
-
-	if bytes.Compare(w.Bytes(), final) != 0 {
-		t.Errorf("expected %#v, got %#v", final, w.Bytes())
-	}
+	testWrite(t, p, w, sizes, outs, final)
 }
 
 func TestPacket1SizeOverflow(t *testing.T) {
@@ -116,15 +91,9 @@ func TestPacket2SizeOverflow(t *testing.T) {
 func TestStreamWrite(t *testing.T) {
 	final := bs("1234567890123\n\nфыва\r\n\tолдж\n1")
 	outs := []bs{bs("123456789"), bs("0123\n"), bs("\nфыва"), bs("\r\n\tолдж\n1")}
+	sizes := []int{9, 5, 9, 13}
 
 	r, w := newRW(bs{})
 	p, _ := Stream(r, w)
-
-	for _, out := range outs {
-		p.Write(out)
-	}
-
-	if bytes.Compare(w.Bytes(), final) != 0 {
-		t.Errorf("expected %#v, got %#v", final, w.Bytes())
-	}
+	testWrite(t, p, w, sizes, outs, final)
 }
