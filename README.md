@@ -12,3 +12,9 @@ http://www.erlang.org/doc/tutorial/c_port.html.
 ## Documentation
 
 [go.eport on go.pkgdoc.org](http://go.pkgdoc.org/github.com/ftrvxmtrx/go.eport)
+
+## Build status
+
+<a href="http://goci.me/project/github.com/ftrvxmtrx/go.eport">
+<img src="http://goci.me/project/image/github.com/ftrvxmtrx/go.eport" />
+</a>
