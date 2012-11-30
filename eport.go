@@ -15,6 +15,9 @@ import (
 // and return n=0 and err=ErrTooBig.
 // It is up to the caller to choose whether to consider this as a fatal error
 // or to continue reading.
+//
+// Line and stream based ports work as simple writers, writing everything as is.
+// Each Write() call in packet based ports, however, writes one single packet.
 type Port interface {
 	io.Reader
 	io.Writer
@@ -24,7 +27,15 @@ type Port interface {
 }
 
 var (
-	ErrBadSizeLen   = errors.New("eport: bad 'packet size' length")
+	// ErrBadSizeLen is returned by Packet(r, w, sizeLen) function when invalid
+	// value of sizeLen is used. Valid values are 1, 2 and 4.
+	ErrBadSizeLen = errors.New("eport: bad 'packet size' length")
+	// ErrSizeOverflow is returned by packet based port's ReadOne() function
+	// when the size of the packet overflows int type.
+	// It is also returned by packet based port's Write() function if the packet
+	// is too big.
 	ErrSizeOverflow = errors.New("eport: packet size overflows integer type")
-	ErrTooBig       = errors.New("eport: packet does not fit the buffer")
+	// ErrToBig is an error which Read(p) function may return if the buffer p is too small
+	// to receive whole line (or packet).
+	ErrTooBig = errors.New("eport: packet does not fit the buffer")
 )

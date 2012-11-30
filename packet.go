@@ -14,7 +14,8 @@ type packetPort struct {
 
 // Packet returns a new packet-based port.
 // Each packet is preceded with its length.
-// The size of the length of the packet is either 1, 2 or 4.
+// The size of the length of the packet (sizeLen) is either 1, 2 or 4.
+// Returns err = ErrBadSizeLen if sizeLen value is invalid.
 func Packet(r io.Reader, w io.Writer, sizeLen int) (Port, error) {
 	switch sizeLen {
 	case 1, 2, 4:
