@@ -69,3 +69,15 @@ func testWrite(t *testing.T, p Port, w *bytes.Buffer, sizes []int, outs []bs, fi
 		t.Errorf("expected %#v, got %#v", final, w.Bytes())
 	}
 }
+
+func TestBadSizeLen(t *testing.T) {
+	r, w := newRW([]byte{})
+	p, err := Packet(r, w, 0)
+	if p != nil {
+		t.Errorf("expected nil port, got %#v", p)
+	}
+
+	if err != ErrBadSizeLen {
+		t.Errorf("expected %#v, got %#v", ErrBadSizeLen, err)
+	}
+}
