@@ -16,8 +16,10 @@ import (
 // It is up to the caller to choose whether to consider this as a fatal error
 // or to continue reading.
 //
-// Line and stream based ports work as simple writers, writing everything as is.
-// Each Write() call in packet based ports, however, writes one single packet.
+// Line and stream based ports work as simple writers, writing everything as is and
+// Write() will return the number of bytes written.
+// Each Write() call in packet based ports, however, writes one single packet and returns
+// the number of bytes written NOT including packet length (1, 2 or 4 bytes).
 type Port interface {
 	io.Reader
 	io.Writer
