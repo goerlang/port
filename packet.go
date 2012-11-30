@@ -18,7 +18,12 @@ type packetPort struct {
 func Packet(r io.Reader, w io.Writer, sizeLen int) (Port, error) {
 	switch sizeLen {
 	case 1, 2, 4:
-		return &packetPort{r, w, 1 << (uint(sizeLen) * 8), make([]byte, sizeLen)}, nil
+		return &packetPort{
+			r,
+			w,
+			1<<(uint(sizeLen)*8) - 1,
+			make([]byte, sizeLen),
+		}, nil
 	}
 
 	return nil, ErrBadSizeLen
