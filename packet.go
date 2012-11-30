@@ -8,7 +8,7 @@ import (
 type packetPort struct {
 	r       io.Reader
 	w       io.Writer
-	max     int
+	max     uint32
 	sizeBuf []byte
 }
 
@@ -21,7 +21,7 @@ func Packet(r io.Reader, w io.Writer, sizeLen int) (Port, error) {
 		return &packetPort{
 			r,
 			w,
-			1<<(uint(sizeLen)*8) - 1,
+			(1 << uint32(sizeLen*8)) - 1,
 			make([]byte, sizeLen),
 		}, nil
 	}
@@ -67,7 +67,7 @@ func (p *packetPort) ReadOne() ([]byte, error) {
 
 func (p *packetPort) Write(data []byte) (int, error) {
 	size := len(data)
-	if size > p.max {
+	if uint32(size) > p.max || int(uint32(size)) != size {
 		return 0, ErrSizeOverflow
 	}
 
