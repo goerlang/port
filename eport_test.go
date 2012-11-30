@@ -61,7 +61,7 @@ func testWrite(t *testing.T, p Port, w *bytes.Buffer, sizes []int, outs []bs, fi
 		}
 
 		if err != nil {
-			t.Errorf("failed on %d: %#v", err)
+			t.Errorf("failed on %d: %#v", i, err)
 		}
 	}
 
