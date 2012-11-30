@@ -8,11 +8,18 @@ import (
 
 type bs []byte
 
+type rfun func() ([]byte, error)
+
 func newRW(from []byte) (*bytes.Reader, *bytes.Buffer) {
 	return bytes.NewReader(from), new(bytes.Buffer)
 }
 
-func testReadOne(t *testing.T, p Port, sizes []int, datas []bs, errs []error) {
+func testRead(
+	t *testing.T,
+	f rfun,
+	sizes []int,
+	datas []bs,
+	errs []error) {
 	var data []byte
 	var err error
 
@@ -22,7 +29,7 @@ func testReadOne(t *testing.T, p Port, sizes []int, datas []bs, errs []error) {
 	}
 
 	for i, size := range sizes {
-		data, err = p.ReadOne()
+		data, err = f()
 		if err != errs[i] {
 			t.Errorf("failed on %d: got error %v, should be %v", i, err, errs[i])
 		}
@@ -37,7 +44,7 @@ func testReadOne(t *testing.T, p Port, sizes []int, datas []bs, errs []error) {
 		}
 	}
 
-	data, err = p.ReadOne()
+	data, err = f()
 
 	if err != io.EOF {
 		t.Errorf("last error value must be io.EOF, got %v instead", err)
@@ -56,8 +63,8 @@ func TestLineReadOne(t *testing.T) {
 
 	r, w := newRW(in)
 	p, _ := Line(r, w)
-
-	testReadOne(t, p, sizes, datas, errors)
+	f := func() ([]byte, error) { return p.ReadOne() }
+	testRead(t, f, sizes, datas, errors)
 }
 
 func TestPacket1ReadOne(t *testing.T) {
@@ -74,8 +81,8 @@ func TestPacket1ReadOne(t *testing.T) {
 
 	r, w := newRW(in)
 	p, _ := Packet(r, w, 1)
-
-	testReadOne(t, p, sizes, datas, errors)
+	f := func() ([]byte, error) { return p.ReadOne() }
+	testRead(t, f, sizes, datas, errors)
 }
 
 func TestPacket2ReadOne(t *testing.T) {
@@ -91,8 +98,8 @@ func TestPacket2ReadOne(t *testing.T) {
 
 	r, w := newRW(in)
 	p, _ := Packet(r, w, 2)
-
-	testReadOne(t, p, sizes, datas, errors)
+	f := func() ([]byte, error) { return p.ReadOne() }
+	testRead(t, f, sizes, datas, errors)
 }
 
 func TestPacket4ReadOne(t *testing.T) {
@@ -107,8 +114,8 @@ func TestPacket4ReadOne(t *testing.T) {
 
 	r, w := newRW(in)
 	p, _ := Packet(r, w, 4)
-
-	testReadOne(t, p, sizes, datas, errors)
+	f := func() ([]byte, error) { return p.ReadOne() }
+	testRead(t, f, sizes, datas, errors)
 }
 
 func TestStreamReadOne(t *testing.T) {
@@ -122,6 +129,6 @@ func TestStreamReadOne(t *testing.T) {
 
 	r, w := newRW(in)
 	p, _ := Stream(r, w)
-
-	testReadOne(t, p, sizes, datas, errors)
+	f := func() ([]byte, error) { return p.ReadOne() }
+	testRead(t, f, sizes, datas, errors)
 }
