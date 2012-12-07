@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	port "github.com/ftrvxmtrx/go.eport"
+	port "github.com/goerlang/port"
 	"io"
 	"log"
 	"os"
