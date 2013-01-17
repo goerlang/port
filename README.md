@@ -1,6 +1,6 @@
 # port
 
-Package eport provides a simple API to write Erlang ports in
+Package port provides a simple API to write Erlang ports in
 Go. Currently line, packet and stream based ports are available for
 use with arbitrary binaries. Sending and receiving arbitrary Erlang
 terms over ports is a **work in progress** (see
